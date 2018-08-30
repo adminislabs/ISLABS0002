@@ -11,7 +11,10 @@ object crimeanalysis {
   var groupRdd = crimeRdd.map(w =>(w.fbicode,w)).groupByKey().collect
   var no_ofcrimes_fbicode = groupRdd.map{case (key,value) => (key,value.size)}
   // narcotics cases in 2015
-  var noof_narcotics_cases = crimeRdd.filter(x => (x.crimetype == "NARCOTICS" && x.year == 2015)).count()  
+  var noof_narcotics_cases = crimeRdd.filter(x => (x.crimetype == "NARCOTICS" && x.year == 2015)).count() 
+    // no. of narcotics case under fbi code
+  var filternarcotics = crimeRdd.filter(x => x.crimetype == "NARCOTICS")
+  var noofnarcotics_each_district = filternarcotics.map(x => x.fbicode).countByValue()
   //for district related theft
   var districtRdd = crimeRdd.filter(x => (x.arrest == "true"))
   var district_theftRdd = districtRdd.filter(x => x.crimetype == "THEFT")
