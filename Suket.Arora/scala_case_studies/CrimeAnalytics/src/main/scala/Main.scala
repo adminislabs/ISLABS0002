@@ -118,7 +118,7 @@ object Main extends App {
     println()
     println("Narcotics cases of 2015 : " + NarcoticsCasesin2015.length)
          println()
-     println(s"Fbicode $NarcCode has $NarCount number of cases.")
+     println(s"Fbicode $NarcCode has $NarCount number of Narcotics cases.")
      println()
 
        println()
