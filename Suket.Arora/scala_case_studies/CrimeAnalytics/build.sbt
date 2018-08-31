@@ -4,6 +4,10 @@ version := "0.1"
 
 scalaVersion := "2.11.8"
 
+showSuccess := false
+
+logLevel in run := Level.Warn
+
 val sparkVersion = "2.3.0"
 
 

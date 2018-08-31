@@ -4,7 +4,7 @@
 		module="crimeanalytics_2.11"
 		revision="0.1"
 		status="integration"
-		publication="20180825154426"
+		publication="20180831105948"
 	>
 		<description>
 		CrimeAnalytics
@@ -37,6 +37,5 @@
 		<dependency org="org.apache.spark" name="spark-mllib_2.11" rev="2.3.0" conf="compile->default(compile)"/>
 		<dependency org="org.apache.spark" name="spark-streaming_2.11" rev="2.3.0" conf="compile->default(compile)"/>
 		<dependency org="org.apache.spark" name="spark-hive_2.11" rev="2.3.0" conf="compile->default(compile)"/>
-		<dependency org="joda-time" name="joda-time" rev="2.1" conf="compile->default(compile)"/>
 	</dependencies>
 </ivy-module>

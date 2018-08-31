@@ -60,6 +60,9 @@ object Main extends App {
       .appName("test")
       .master("local[2]")
       .getOrCreate()
+
+
+     sc.setLogLevel("ERROR")
       
 
    val resource = getClass.getResourceAsStream("/Crime_dataset.csv")
@@ -72,6 +75,8 @@ object Main extends App {
      val CrimesInEachFbicode : Array[(String, Long)] = CrimeDS.groupBy($"Fbicode").count().collect.map {row => (row(0).asInstanceOf[String],row(1).asInstanceOf[Long])} 
    
 
+
+
      def windowSpec = Window.partitionBy("District", "Fbicode")                                  //defining a window frame for the aggregation
 
      val MostFrequentCrimesinEachDistrict : Array[(String, String)]=  CrimeDS.withColumn("count", count("Fbicode").over(windowSpec))     // counting repeatition of Fbicode for each group of District, Fbicode and assigning that Fbicode to new column called as count
@@ -81,6 +86,8 @@ object Main extends App {
                                                                       .collect.map {row => (row(0).asInstanceOf[String],row(1).asInstanceOf[String])}                        
     
      
+
+     
       // ******************************* Wrong Syntax ******************** 
       // val YearWiseCrimeUnderFbicode = CrimeDS.groupBy($"Year").groupBy($"Fbicode").count
 
@@ -88,23 +95,32 @@ object Main extends App {
     val Years = CrimeDS.groupBy($"Year").count.collect.map {row => row(0).asInstanceOf[Int]}.sorted
     var FbiCasesYearWise:Map[Int,Array[(String,Long)]] = Map()
 
-    for ( count <- 0 to Years.length-1){
-        FbiCasesYearWise+=( Years(count) -> CrimeDS.filter($"Year" === Years(count)).groupBy($"Fbicode").count.collect.map {row => (row(0).asInstanceOf[String],row(1).asInstanceOf[Long])} )
-
-    }
-    
-
+   
      // FbiCasesYearWise(2015).sortWith(_._2 >_._2 )
 
     
-    val NarcoticsCasesin2015 : Array[CrimeRecord] = CrimeDS.filter(($"Primary_type" === "NARCOTICS") && ($"Year" === 2015)).collect
    
+
      val AllNarcoticsCases = CrimeDS.filter($"Primary_type" === "NARCOTICS")
     
      val FbicodeWithMaxNarcoticsCases : Array[(String, Long)] =  AllNarcoticsCases.groupBy($"Fbicode").count.orderBy($"count".desc).limit(1).collect.map {row => (row(0).asInstanceOf[String],row(1).asInstanceOf[Long])} // (code,count)
-
+      val NarcCode = FbicodeWithMaxNarcoticsCases(0)._1
+     
+    
     val TheftRelatedArrestsInEachDistrict : Array[(String, Long)] =  CrimeDS.filter(($"Primary_type" === "THEFT") && ($"Arrest" === true)).groupBy($"District").count.collect.map {row => (row(0).asInstanceOf[String],row(1).asInstanceOf[Long])}// (District, Arrest_count)
   
+
+        val NarCount = FbicodeWithMaxNarcoticsCases(0)._2
+     
+ 
+         
+        val NarcoticsCasesin2015 : Array[CrimeRecord] = CrimeDS.filter(($"Primary_type" === "NARCOTICS") && ($"Year" === 2015)).collect
+    println()
+    println("Narcotics cases of 2015 : " + NarcoticsCasesin2015.length)
+         println()
+     println(s"Fbicode $NarcCode has $NarCount number of cases.")
+     println()
+
        println()
     println("Number of Crimes in each FBI code : ")
     println()
@@ -117,9 +133,8 @@ object Main extends App {
                          println(f"Fbicode = $Fbicode%4s    Number of Crimes = $Crimecount")
                         
 
-                        }
-
-       println()
+                        } 
+         println()
         println("Most frequent crimes in District : ")
     println()
      for ( count <- 0 to MostFrequentCrimesinEachDistrict.length-1){
@@ -132,8 +147,19 @@ object Main extends App {
                         
 
                         }  
+                       
+       for ( count <- 0 to Years.length-1){
+        FbiCasesYearWise+=( Years(count) -> CrimeDS.filter($"Year" === Years(count)).groupBy($"Fbicode").count.collect.map {row => (row(0).asInstanceOf[String],row(1).asInstanceOf[Long])} )
+
+        println(" Year = " +Years(count) + " [Fbicode , No of Crimes]  " )
+
+        println(CrimeDS.filter($"Year" === Years(count)).groupBy($"Fbicode").count.collect.foreach(println))
+        println()
+    }
+    
+                                    
           println()                 
-             println("Number of Crimes in each FBI code : ")
+             println("Number of Arrests in each District for Theft : ")
     println()
      for ( count <- 0 to TheftRelatedArrestsInEachDistrict.length-1){
 
@@ -142,7 +168,8 @@ object Main extends App {
                          var District = tuple._1
                          var Arrestcount = tuple._2
                          println(f"District = $District%4s    Number of Arrests for Theft = $Arrestcount")
-                        
+   
+                  
 
                         }
   sc.stop()
