@@ -24,7 +24,7 @@ object Main extends App {
       .master("local[2]")
       .getOrCreate()
       
-
+      sc.setLogLevel("ERROR")
  // val RddRaw = sc.textFile("file:///home/suket/case_studies/EmergencyHelplineCaseStudy/src/main/resources/zipcode.csv") 
 
 val customSchema = StructType(Array(
@@ -108,32 +108,61 @@ val code911WithProblem = code911.withColumn("Problem", substring(col("title")))
         CrimesCityWise+=( CrimesInEachCity(count)._1 -> Full_Data.filter($"city" === CrimesInEachCity(count)._1).groupBy($"Problem").count.collect.map {row => (row(0).asInstanceOf[String],row(1).asInstanceOf[Long])} )
 
     }                                                                                       
-     
+     println("Emergencies in Each State :")
+     println()
     CrimesStateWise foreach {case (key, value) => println(value.foreach(print)  + " Emergencies in "+key)}
-
+    println()
+    println("Emergencies in Each City :")
      println()
     
     CrimesCityWise foreach {case (key, value) => println(value.foreach(print)  + " Emergencies in "+key)}
 
 
-/*             // ---------------------------   Finds only most Frequent Crime ---------------------------
- def windowSpec = Window.partitionBy("state", "Problem") 
+             // ---------------------------   Finds only most Frequent Emergency Problems ---------------------------
+ def windowSpec = Window.partitionBy("state", "title") 
 
-   val MostPrevelantProbleminEachstate /*: Array[(String, String)] */=  Full_Data.withColumn("count", count("Problem").over(windowSpec))     // counting repeatition of Problem for each group of state, Problem and assigning that Problem to new column called as count
+   val MostPrevelantProbleminEachstate /*: Array[(String, String)] */=  Full_Data.withColumn("count", count("title").over(windowSpec))     // counting repeatition of title for each group of state, title and assigning that title to new column called as count
                                                                       .orderBy($"count".desc)                                   // order dataframe with count in descending order
                                                                       .groupBy("state")                                           // group by state
-                                                                      .agg(first("Problem").as("Problem"))                         //taking the first row of each key with count column as the highest
+                                                                      .agg(first("title").as("title"))                         //taking the first row of each key with count column as the highest
                                                                       .collect.map {row => (row(0).asInstanceOf[String],row(1).asInstanceOf[String])}                        
     
-   def windowSpec2 = Window.partitionBy("city", "Problem") 
+   def windowSpec2 = Window.partitionBy("city", "title") 
 
-   val MostPrevelantProbleminEachCity /*: Array[(String, String)]*/ =  Full_Data.withColumn("count", count("Problem").over(windowSpec2))     // counting repeatition of Problem for each group of state, Problem and assigning that Problem to new column called as count
+   val MostPrevelantProbleminEachCity /*: Array[(String, String)]*/ =  Full_Data.withColumn("count", count("title").over(windowSpec2))     // counting repeatition of title for each group of state, title and assigning that title to new column called as count
                                                                       .orderBy($"count".desc)                                   // order dataframe with count in descending order
                                                                       .groupBy("city")                                           // group by state
-                                                                      .agg(first("Problem").as("Problem"))                         //taking the first row of each key with count column as the highest
+                                                                      .agg(first("title").as("title"))                         //taking the first row of each key with count column as the highest
                                                                       .collect.map {row => (row(0).asInstanceOf[String],row(1).asInstanceOf[String])} 
 
-*/
+ println()
+        println("Most frequent Emergency in each State : ")
+    println()
+     for ( count <- 0 to MostPrevelantProbleminEachstate.length-1){
+
+                         var tuple = MostPrevelantProbleminEachstate(count)
+                         // println(tuple)
+                         var  State= tuple._1
+                         var Emergency = tuple._2
+                         println(f"State = $State%4s    Most frequent Emergency  = $Emergency")
+                        
+
+                        }
+
+   println()
+        println("Most frequent Emergency in each City : ")
+    println()
+     for ( count <- 0 to MostPrevelantProbleminEachCity.length-1){
+
+                         var tuple = MostPrevelantProbleminEachCity(count)
+                         // println(tuple)
+                         var  City= tuple._1
+                         var Emergency = tuple._2
+                         println(f"City = $City%20s    Most frequent Emergency  = $Emergency")
+                        
+
+                        }
+                       
  
 
 
