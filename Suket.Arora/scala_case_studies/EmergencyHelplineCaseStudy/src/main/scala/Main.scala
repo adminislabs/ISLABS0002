@@ -1,12 +1,8 @@
 import org.apache.spark._
-import scala.math.BigDecimal
-import scala.io.Source
-import java.sql.Date
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.expressions._                   //import Window library
-import java.text.SimpleDateFormat
 import org.apache.spark.sql.types._
 
 
