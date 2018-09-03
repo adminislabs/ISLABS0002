@@ -7,7 +7,7 @@ Just pull the repository and download files from link given below and run comman
 
 # Problem Statement
 
-https://www.kaggle.com/cesarcf1977/movielens-data-analysis-beginner-s-first/notebook
+https://www.kaggle.com/cesarcf1977/movielens-data-analysis-beginner-s-first/data
 
 1. **PLOT#1**: Number of movies and ratings per year.
 **INSIGHT#1**: Number of movies released per year increasing almost exponentially until 2009,
