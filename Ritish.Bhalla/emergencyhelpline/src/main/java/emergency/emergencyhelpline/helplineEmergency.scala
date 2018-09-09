@@ -18,11 +18,13 @@ object helplineEmergency {
   var group911Rdd = emergencyData911.map(w => (w.zip,w.title))
 
   var filterRdd2 = zipRdd.filter(x => !x.contains("zip"))
+    //removing quotes
   var removequotesrdd = filterRdd2.map(x => x.replace('"', ' ').trim())
   var emergencyData1 = removequotesrdd.map(x => x.replace(" ","").trim())
   var emergencyDatazip = emergencyData1.map(parse2)
   var groupcityzipRdd = emergencyDatazip.map(w =>(w.zip,w.city))
   var groupstatezipRdd = emergencyDatazip.map(w => (w.zip,w.state))
+  //combining rdds
   var combinedRdd = group911Rdd.join(groupstatezipRdd)
   var staterdd = combinedRdd.map{case (a,(b,c)) => (b,c)}
   var stateRddcount = staterdd.map(x => (x._1,x._2)).countByValue()
@@ -31,6 +33,7 @@ object helplineEmergency {
   var groupRdd = group911Rdd.join(groupcityzipRdd)
   var cityrdd = groupRdd.map{case (a,(b,c)) => (b,c)}
   var cityRddcount = cityrdd.map(x => (x._1,x._2)).countByValue()
+  //for final printing
   println("")
   var finalstateRdd = stateRddcount.map{case ((a,b),c) => (f"Crime Type=$a%8s",f" State=$b%4s",f" Crime Count=$c%8s")}.foreach(println)
   println("")
