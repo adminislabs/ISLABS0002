@@ -10,32 +10,34 @@ var filterRdd = firstRdd.filter(x => !x.contains("Account_id"))
 var filterRdd2 = secondRdd.filter(x => !x.contains("Account_id"))
 var bankdata = filterRdd.map(parse)
 var bankdata2 = filterRdd2.map(parse2)
-
+// for filtering C from first file
 var filterCredit = bankdata.filter(x => x.card == 'C')
 var pairRddCredit = filterCredit.map(x => (x.card,x.amount)).groupByKey().collect()
 var finalCreditsize  = pairRddCredit.map{case (key,value) => (key,value.size)} 
 var finalCreditsum = pairRddCredit.map{case (key,value) => (key,value.sum)}
 var zipRddCredit = finalCreditsize.zip(finalCreditsum).map{case ((a,b),(c,d)) => (a,d/b)}
-
+// for filtering C from second file
 var filterCredit2 = bankdata2.filter(x => x.card == 'C')
 var pairRddCredit2 = filterCredit2.map(x => (x.card,x.amount)).groupByKey().collect()
 var finalCreditsize2  = pairRddCredit2.map{case (key,value) => (key,value.size)} 
 var finalCreditsum2 = pairRddCredit2.map{case (key,value) => (key,value.sum)}
 var zipRddCredit2 = finalCreditsize2.zip(finalCreditsum2).map{case ((a,b),(c,d)) => (a,d/b)}
+//Combining C from first and second file
 var zippedCredit = zipRddCredit.zip(zipRddCredit2).map{case ((a,b),(c,d)) => (a,(b+d)/2)}
 var averageof_CreditCard = zippedCredit.map{case (a,b) => (f"Average Transaction Amount from Credit = $b%.2f")}
-
+// for filtering D from first file
 var filterDebit = bankdata.filter(x => x.card == 'D')
 var pairRddDebit = filterDebit.map(x => (x.card,x.amount)).groupByKey().collect()
 var finalDebitsize  = pairRddDebit.map{case (key,value) => (key,value.size)} 
 var finalDebitsum = pairRddDebit.map{case (key,value) => (key,value.sum)}
 var zipRddDebit = finalDebitsize.zip(finalDebitsum).map{case ((a,b),(c,d)) => (a,d/b)}
-
+// for filtering D from second file
 var filterDebit2 = bankdata2.filter(x => x.card == 'D')
 var pairRddDebit2 = filterDebit2.map(x => (x.card,x.amount)).groupByKey().collect()
 var finalDebitsize2  = pairRddDebit2.map{case (key,value) => (key,value.size)} 
 var finalDebitsum2 = pairRddDebit2.map{case (key,value) => (key,value.sum)}
 var zipRddDebit2 = finalDebitsize2.zip(finalDebitsum2).map{case ((a,b),(c,d)) => (a,d/b)}
+//Combining C from first and second file
 var zippedDebit = zipRddDebit.zip(zipRddDebit2).map{case ((a,b),(c,d)) => (a,(b+d)/2)}
 var averageof_DebitCard = zippedDebit.map{case (a,b) => (f"Average Transaction Amount from Debit = $b%.2f")}
 
