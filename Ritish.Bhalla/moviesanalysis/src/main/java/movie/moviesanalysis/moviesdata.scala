@@ -1,6 +1,5 @@
 package movie.moviesanalysis
 import org.apache.spark._
-import scala.util.matching.Regex
 
 object moviesdata {
   def main(arg: Array[String]): Unit = {
