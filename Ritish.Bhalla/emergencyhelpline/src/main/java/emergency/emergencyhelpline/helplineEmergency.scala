@@ -4,7 +4,7 @@ import scala.util.matching.Regex
 
 object helplineEmergency {
   def main(arg: Array[String]): Unit = {
-  var sparkConf = new SparkConf()
+  var sparkConf = new SparkConf().setMaster("local").setAppName("Emergency")
   var sc = new SparkContext(sparkConf)
   var Rdd911 = sc.textFile("file:///home/ritish/Downloads/EmergencyHelpline/911.csv")
   var zipRdd = sc.textFile("file:///home/ritish/Downloads/EmergencyHelpline/zipcode.csv")
@@ -26,12 +26,17 @@ object helplineEmergency {
   var combinedRdd = group911Rdd.join(groupstatezipRdd)
   var staterdd = combinedRdd.map{case (a,(b,c)) => (b,c)}
   var stateRddcount = staterdd.map(x => (x._1,x._2)).countByValue()
-  var finalstateRdd = stateRddcount.map{case ((a,b),c) => (f"Crime Type=$a%8s",f" State=$b%4s",f" Crime Count=$c%8s")}
+  //var finalstateRdd = stateRddcount.map{case ((a,b),c) => (f"Crime Type=$a%8s",f" State=$b%4s",f" Crime Count=$c%8s")}.foreach(println)
     
   var groupRdd = group911Rdd.join(groupcityzipRdd)
   var cityrdd = groupRdd.map{case (a,(b,c)) => (b,c)}
   var cityRddcount = cityrdd.map(x => (x._1,x._2)).countByValue()
-  var finalcityRdd = cityRddcount.map{case ((a,b),c) => (f"Crime Type=$a%8s",f" City=$b%21s",f" Crime Count=$c%8s")}
+  println("")
+  var finalstateRdd = stateRddcount.map{case ((a,b),c) => (f"Crime Type=$a%8s",f" State=$b%4s",f" Crime Count=$c%8s")}.foreach(println)
+  println("")
+  var finalcityRdd = cityRddcount.map{case ((a,b),c) => (f"Crime Type=$a%8s",f" City=$b%21s",f" Crime Count=$c%8s")}.foreach(println)
+  println("")
+  sc.stop()
 }
   case class Emergency(latitude: Double, longitude: Double, description: String, zip: Int, title: String, timestamp: String, twp: String, address: String, e:Int)
     def parse(row: String): Emergency = {
