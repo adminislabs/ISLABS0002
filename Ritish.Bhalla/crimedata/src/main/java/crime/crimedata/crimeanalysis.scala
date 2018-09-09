@@ -23,7 +23,6 @@ object crimeanalysis {
   var noof_wardcasecaught = crimeRdd.map(x =>x.ward).countByValue()
   // for community
   var noof_communitycaught = crimeRdd.map(x =>x.community).countByValue()
-  
   }
   case class Crime(id: Int,casenumber: String,date: String,block: String,iucr: String,crimetype: String,descriptionofcrime: String,locationcrime: String,arrest: String,domestic: String,beat: Int,district: Int,ward: Int,community: Int,fbicode: String,xcord: Int,ycord: Int,year: Int,updated_on: String,latitude: Double,longitude: Double,location: String)
   def parse(row: String): Crime={
