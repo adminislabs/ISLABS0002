@@ -6,8 +6,8 @@ import org.apache.spark._
 import scala.util.matching.Regex
 object flightanalysis {
   def main(arg: Array[String]): Unit = {
- var sparkConf = new SparkConf()
- var sc = new SparkContext(sparkConf)
+ var sparkConf = new SparkConf().setMaster("local").setAppName("Flight")
+  var sc = new SparkContext(sparkConf)
  var firstRdd = sc.textFile("file:///home/ritish/Downloads/flight-delays/flights.csv")
  var filterRdd = firstRdd.filter(x => !x.contains("YEAR"))
  var newrdd = filterRdd.filter{x =>
@@ -15,21 +15,21 @@ object flightanalysis {
  numberPattern.findFirstMatchIn(x) == None
  }
  var flightData1 = newrdd.map(parse)
- var totalDistance = flightData1.map(_.distance).reduce((x, y) => x + y)
- var totalflights = flightData1.count
+ //var totalDistance = flightData1.map(_.distance).reduce((x, y) => x + y)
+ var totalflights = flightData1.count()
  var depDelay = flightData1.filter(x =>(x.dep_dely>0))
  var depDelayCount = depDelay.count
- var arrDelay = flightData1.filter(x =>(x.ar_delay>0))
- var arrDelayCount = arrDelay.count
+ //var arrDelay = flightData1.filter(x =>(x.ar_delay>0))
+ //var arrDelayCount = arrDelay.count
  var depDelaypercent = (depDelayCount*100.0)/totalflights
- var arrDelaypercent = (arrDelayCount*100.0)/totalflights
+ //var arrDelaypercent = (arrDelayCount*100.0)/totalflights
  var averageDepDelay = depDelay.map(x => x.dep_dely) 
  val sumadely = averageDepDelay.reduce(_+_)
  var averageofDepDelay = sumadely/depDelayCount
- var avgarrDel = arrDelay.map(x => x.ar_delay)
- val sumarrdely = avgarrDel.reduce(_+_)
- var averageofarrDelay = sumarrdely/arrDelayCount
- var flightdata = sc.parallelize(flightData1.take(5000))
+ //var avgarrDel = arrDelay.map(x => x.ar_delay)
+ //val sumarrdely = avgarrDel.reduce(_+_)
+ //var averageofarrDelay = sumarrdely/arrDelayCount
+ var flightdata = sc.parallelize(flightData1.take(580000))
  var groupRdd = flightdata.map(w =>(w.airline,w)).groupByKey().collect
  var noofdelayedflightofairlines = groupRdd.map{ case (key,value) => (key,value.filter(_.dep_dely>0))}
  var countofdelayedflightofairlines = noofdelayedflightofairlines.map{ case (key,value) => (key,value.size)}.toList
@@ -41,8 +41,15 @@ object flightanalysis {
  var dd=countofdelayedflightofairlines.zip(abc)
  var dd1=dd.map{ case ((a,b),(c,d))=>(a,d/b)}
 
- var finalRdd = fourthRdd.zip(dd1).map{case ((a,b,c,d),(e,f)) => (f"Airline=$a%29s",f" Total Flights=$b%7s",f" Delayed Flights=$c%7s",f" Delay Percentage=  $d%.2f"+" %",f" Average Delay=  $f%.2f")}
- 
+println("")
+println("Total Number of Flights = " +totalflights) 
+println("Delayed Flights =" +depDelayCount)
+println("Percentage of delayed flights = " +depDelaypercent+ " %")
+println("Average Delay Time = " +averageofDepDelay)
+println("")
+var finalRdd = fourthRdd.zip(dd1).map{case ((a,b,c,d),(e,f)) => (f"Airline = $a%29s",f" Total Flights = $b%7s",f" Delayed Flights= $c%6s",f" Delay Percentage = $d%.2f"+" %",f" Average Delay = $f%.2f")}.foreach(println)
+println("")
+sc.stop()
 }
 case class Flight(date: LocalDate, airline: String, flightNumber: String, origin: String,dest: String, dep: LocalTime, dep_dely: Double, arv: LocalTime,ar_delay: Double, airtime: Double, distance: Double) extends Serializable {}
 def parse(row: String): Flight = {
