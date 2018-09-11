@@ -1,4 +1,4 @@
-package khaatachaalu.hogya
+package bank.com
 import scala.util.matching.Regex
 import org.apache.spark._
 object com {
