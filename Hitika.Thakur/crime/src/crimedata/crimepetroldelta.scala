@@ -6,22 +6,28 @@ import scala.util.matching.Regex
 
 object crimepetroldelta{
    def main(args: Array[String]): Unit = {
-   var sparkConf = new SparkConf()
+   var sparkConf = new SparkConf().setMaster("local").setAppName("Transaction")
    var sc = new SparkContext(sparkConf)
    var saverdd = sc.textFile("file:///home/hitika/Downloads/CrimeData/crime_data.csv")
    var parserdd = saverdd.map(parse)
    var fbirdd = parserdd.map(x => (x.Fbicode,x))
    var crimetyperdd = fbirdd.mapValues(x => (x.Primary_type)).countByValue()
-   var finalrdd = crimetyperdd.map{case ((a,b),c) => (f"FBI Code= $a%4s " ,f"Crime Type = $b%28s ",f"Count = $c%7s")}
+   //var finalrdd = crimetyperdd.map{case ((a,b),c) => (f"FBI Code= $a%4s " ,f"Crime Type = $b%40s ",f"Count = $c%7s")}
    
    var yearrdd = parserdd.map(x => (x.Year, x.Primary_type)).countByValue()
-   var finalyearrdd = yearrdd.map{case ((a,b),c) => (f"YEAR= $a%4s ",f"Crime Type = $b%40s ",f"Count = $c%7s")}
+   //var finalyearrdd = yearrdd.map{case ((a,b),c) => (f"YEAR= $a%4s ",f"Crime Type = $b%40s ",f"Count = $c%7s")}
    
    var disttrdd = parserdd.filter(x => (x.Arrest == "true"))
-  var thirdrdd = disttrdd.filter(x =>(x.Primary_type =="THEFT")) 
-  var mapdistt = thirdrdd.map(x => (x.District )).countByValue()
-  
-  //var final3rdd = thirdrdd.map{case ((a,b,c),d) => (a,d,c)}
+   var thirdrdd = disttrdd.filter(x =>(x.Primary_type =="THEFT")) 
+   var mapdistt = thirdrdd.map(x => (x.District )).countByValue()
+   println()
+   var finalrdd = crimetyperdd.map{case ((a,b),c) => (f"FBI Code= $a%4s " ,f"Crime Type = $b%40s ",f"Count = $c%7s")}.foreach(println)
+   println()
+   var finalyearrdd = yearrdd.map{case ((a,b),c) => (f"YEAR= $a%4s ",f"Crime Type = $b%40s ",f"Count = $c%7s")}.foreach(println)
+   println()
+   var district_theft = mapdistt.map{case (a,b) => (f"District = $a%5s",f" Theft related arrests = $b%5s")}.foreach(println)
+   println()
+   sc.stop()
    
    }
   
@@ -56,7 +62,6 @@ Location_description:String,Arrest: String ,Domestic: String ,Beat: Int, Distric
     
   }
   }
-
 
 
 
