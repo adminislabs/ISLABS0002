@@ -5,7 +5,7 @@ import org.apache.spark._
 
 object crimepetroldelta{
    def main(args: Array[String]): Unit = {
-   var sparkConf = new SparkConf().setMaster("local").setAppName("Transaction")
+   var sparkConf = new SparkConf().setMaster("local").setAppName("Crime")
    var sc = new SparkContext(sparkConf)
    var saverdd = sc.textFile("file:///home/hitika/Downloads/CrimeData/crime_data.csv")
    var parserdd = saverdd.map(parse)
