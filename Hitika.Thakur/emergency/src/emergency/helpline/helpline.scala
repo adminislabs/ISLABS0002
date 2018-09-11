@@ -7,8 +7,9 @@ import scala.util.matching.Regex
 object helpline
 {
 def main(arg: Array[String]): Unit = {
- var sparkConf = new SparkConf()
+ var sparkConf = new SparkConf().setMaster("local").setAppName("Emergency")
  var sc = new SparkContext(sparkConf)
+
   var rdd911 = sc.textFile("file:///home/hitika/Downloads/EmergencyHelpline/911.csv")
   var ziprdd = sc.textFile("file:///home/hitika/Downloads/EmergencyHelpline/zipcode.csv")
   var filterrdd911 = rdd911.filter(x =>  !x.contains("lat"))
@@ -31,20 +32,23 @@ def main(arg: Array[String]): Unit = {
    var combordd = zipsortrdd.join(sort911rdd)
    var removebracerdd = combordd.map{case(a,(b,c)) => (b,c)}
  var countcrimerdd = removebracerdd.map(x => (x._1, x._2 )).countByValue()
-var finalstaterdd = countcrimerdd.map{case((a,b),c) => (f"State = $a%3s ",   f" Crime =$b%9s ",  f" CrimeCount=$c%7s ")} 
+
  
  
 var zipsortcity = parserddzip.map(x => (x.zip, x.city))
 var combocityrdd = zipsortcity.join(sort911rdd)
  var removebracecity = combocityrdd.map{case(a,(b,c)) => (b,c)}
 var countcitycrime = removebracecity.map(x => (x._1, x._2)).countByValue()
-var finalcityrdd = countcitycrime.map{case((a,b),c) => (f"City = $a%22s",  f" Crime =$b%10s ", f" Crime Count= $c%8s ")}
 
+println()
 
- 
-//(f"Airline=$a%29s",f" Total Flights=$b%7s",f" Delayed Flights=$c%7s",f" Delay Percentage=  $d%.2f"+" %",f" Average Delay=  $f%2s%.2f")}
+var finalstaterdd = countcrimerdd.map{case((a,b),c) => (f"State = $a%3s ",   f" Crime =$b%9s ",  f" CrimeCount=$c%7s ")}.foreach(println)
+println()
+var finalcityrdd = countcitycrime.map{case((a,b),c) => (f"City = $a%22s",  f" Crime =$b%10s ", f" Crime Count= $c%8s ")}.foreach(println)
+println()
+
   
-   
+ sc.stop()  
 }
 
 
