@@ -34,10 +34,10 @@ object moviesdata {
  var sumofratings = groupratingforuser.map{case (k,v) => (k,v.sum)}
  var ziprdd = sizeforratings.zip(sumofratings).map{case ((a,b),(c,d)) => (a,d/b)}
  //var showratingforuser = ziprdd.map{case (a,b) => (f"User_id =$a%8s", f" Average rating per user =$b%4s")}
- var showmoviesdata = size_year.map{case (a,b) => (f"Year = $a%6s",f" Movies in this year = $b%6s")}
- var showratingdata = size_rating.map{case (a,b) => (f"Year = $a%6s",f" Ratings in this year = $b%6s")}
- var showratingforyear = combinerdd.map{case (a,b) => (f"Movie_id =$a%8s", f" Average rating =$b%4s")}
-var showratingforuser = ziprdd.map{case (a,b) => (f"User_id =$a%8s", f" Average rating per user =$b%4s")}
+ var showmoviesdata = size_year.map{case (a,b) => (f"Year = $a%6s",f" Movies in this year = $b%6s")}.foreach(println)
+ var showratingdata = size_rating.map{case (a,b) => (f"Year = $a%6s",f" Ratings in this year = $b%6s")}.foreach(println)
+ var showratingforyear = combinerdd.map{case (a,b) => (f"Movie_id =$a%8s", f" Average rating =$b%4s")}.foreach(println)
+var showratingforuser = ziprdd.map{case (a,b) => (f"User_id =$a%8s", f" Average rating per user =$b%4s")}.foreach(println)
  sc.stop()
  }
 case class Movie(movie_id: Int, title: String, genres: String)
