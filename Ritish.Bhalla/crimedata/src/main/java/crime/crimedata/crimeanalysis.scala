@@ -11,28 +11,40 @@ object crimeanalysis {
   // crime under each fbi code
   var groupRdd = crimeRdd.map(w =>(w.fbicode,w)).groupByKey().collect
   var no_ofcrimes_fbicode = groupRdd.map{case (key,value) => (key,value.size)}
-  var show_fbi = no_ofcrimes_fbicode.map{case (a,b) => (f"Fbi Code =$a%5s", f"No. of Crimes=$b%5s")}
+  //var show_fbi = no_ofcrimes_fbicode.map{case (a,b) => (f"Fbi Code =$a%5s", f"No. of Crimes=$b%5s")}
   // narcotics cases in 2015
   var noof_narcotics_cases = crimeRdd.filter(x => (x.crimetype == "NARCOTICS" && x.year == 2015)).count()
-  println("No. of Narcotics cases in 2015 = "+noof_narcotics_cases)
+  //println("No. of Narcotics cases in 2015 = "+noof_narcotics_cases)
   // no. of narcotics case under fbi code in district
   var filternarcotics = crimeRdd.filter(x => x.crimetype == "NARCOTICS")
   var noofnarcotics_each_district = filternarcotics.map(x => x.fbicode).countByValue()
-  var shownarcocrime  = noofnarcotics_each_district.map{case (a,b) => (f"District =$a%5s",f"No. of Narcotics cases=$b%5s")}.foreach(println)
+  //var shownarcocrime  = noofnarcotics_each_district.map{case (a,b) => (f"District =$a%5s",f"No. of Narcotics cases=$b%5s")}.foreach(println)
   //for district related theft
   var districtRdd = crimeRdd.filter(x => (x.arrest == "true"))
   var district_theftRdd = districtRdd.filter(x => x.crimetype == "THEFT")
   var noof_districttheft = district_theftRdd.map(x => x.district).countByValue()
-  var showtheftarrest = noof_districttheft.map{case (a,b) => (f"District =$a%5s",f"No. of Theft related arrests=$b%5s")}.foreach(println)
+  //var showtheftarrest = noof_districttheft.map{case (a,b) => (f"District =$a%5s",f"No. of Theft related arrests=$b%5s")}.foreach(println)
   // for ward
   var noof_wardcasecaught = crimeRdd.map(x =>x.ward).countByValue()
-  var showwardcases = noof_wardcasecaught.map{case (a,b) => (f"Ward =$a%5s",f"No. of Crime cases=$b%5s")}.foreach(println)
+  //var showwardcases = noof_wardcasecaught.map{case (a,b) => (f"Ward =$a%5s",f"No. of Crime cases=$b%5s")}.foreach(println)
 
   // for community
   var noof_communitycaught = crimeRdd.map(x =>x.community).countByValue()
+  //var showcommunitycases = noof_communitycaught.map{case (a,b) => (f"Community =$a%5s",f"No. of Crime cases=$b%5s")}.foreach(println)
+  println("")
+  var show_fbi = no_ofcrimes_fbicode.map{case (a,b) => (f"Fbi Code =$a%5s", f"No. of Crimes=$b%5s")}.foreach(println)
+println("")
+  println("No. of Narcotics cases in 2015 = "+noof_narcotics_cases)
+println("")
+  var shownarcocrime  = noofnarcotics_each_district.map{case (a,b) => (f"District =$a%5s",f"No. of Narcotics cases=$b%5s")}.foreach(println)
+println("")
+  var showtheftarrest = noof_districttheft.map{case (a,b) => (f"District =$a%5s",f"No. of Theft related arrests=$b%5s")}.foreach(println)
+println("")
+  var showwardcases = noof_wardcasecaught.map{case (a,b) => (f"Ward =$a%5s",f"No. of Crime cases=$b%5s")}.foreach(println)
+println("")
   var showcommunitycases = noof_communitycaught.map{case (a,b) => (f"Community =$a%5s",f"No. of Crime cases=$b%5s")}.foreach(println)
-
-  sc.stop()
+println("")
+sc.stop()
   }
   case class Crime(id: Int,casenumber: String,date: String,block: String,iucr: String,crimetype: String,descriptionofcrime: String,locationcrime: String,arrest: String,domestic: String,beat: Int,district: Int,ward: Int,community: Int,fbicode: String,xcord: Int,ycord: Int,year: Int,updated_on: String,latitude: Double,longitude: Double,location: String)
   def parse(row: String): Crime={
