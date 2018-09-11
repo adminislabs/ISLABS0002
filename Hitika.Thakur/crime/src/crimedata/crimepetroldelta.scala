@@ -1,7 +1,6 @@
 
 package crimedata
 import org.apache.spark._
-import scala.util.matching.Regex
 
 
 object crimepetroldelta{
