@@ -1,0 +1,135 @@
+
+object maze {
+  def main(args: Array[String]) {
+
+    println("Enter the number of rows")
+    var row = scala.io.StdIn.readInt()
+
+    println("Enter the number of columns")
+    var col = scala.io.StdIn.readInt()
+
+    var arr = Array.ofDim[Int](row, col)
+    var sourcex = new Array[Int](row * col)
+    var sourcey = new Array[Int](row * col)
+    var k = 0
+    var destinationx = 0
+    var destinationy = 0
+
+
+    println("Enter your data")
+    for (i <- 0 to row - 1) {
+      for (j <- 0 to col - 1) {
+        arr(i)(j) = scala.io.StdIn.readInt()
+        if (arr(i)(j) == 2) {
+          sourcex(k) = i
+          sourcey(k) = j
+          k = k + 1
+        }
+        if (arr(i)(j) == 3) {
+          destinationx = i
+          destinationy = j
+        }
+      }
+    }
+
+    println("Here is the data you entered")
+    for (i <- 0 to row - 1) {
+      for (j <- 0 to col - 1) {
+        print(arr(i)(j)+"/t")
+      }
+      println(" ")
+    }
+
+
+    for (i <- 0 to k - 1) {
+      var xst = sourcex(i)
+      var yst = sourcey(i)
+      no_maze_exist(arr, row, col, sourcex(i), sourcey(i), destinationx, destinationy, xst, yst)
+
+    }
+  }
+
+
+  def Print_Sol(sol: Array[Array[Int]], row: Int, col: Int) {
+    println("The most optimized path for the problem given is")
+    for (i <- 0 to row - 1) {
+      for (j <- 0 to col - 1) {
+        print(sol(i)(j))
+      }
+      println(" ")
+    }
+  }
+
+  def IsSafe(arr: Array[Array[Int]], x: Int, y: Int, row: Int, col: Int): Boolean = {
+    return (x >= 0 && x < row && y >= 0 && y <= col && ((arr(x)(y) == 1) || (arr(x)(y) == 2)))
+
+  }
+
+  def no_maze_exist(arr: Array[Array[Int]], row: Int, col: Int, sourcex: Int, sourcey: Int, destinationx: Int, destinationy: Int, xst: Int, yst: Int): Boolean = {
+    var sol = Array.ofDim[Int](row, col)
+
+    if (Solve_Maze(arr, sourcex, sourcey, sol, row, col, destinationx, destinationy, xst, yst) == false) {
+      println("No solution exists to this problem")
+      return false
+    }
+    Print_Sol(sol, row, col)
+    return true
+  }
+
+  def Solve_Maze(arr: Array[Array[Int]], x: Int, y: Int, sol: Array[Array[Int]], row: Int, col: Int, destinationx: Int, destinationy: Int, xst: Int, yst: Int): Boolean = {
+
+    if (x == destinationx && y == destinationy) {
+      sol(x)(y) = 1
+      return true
+    }
+
+    if (IsSafe(arr, x, y, row, col) == true) {
+
+      sol(x)(y) = 1
+
+      if (xst <= destinationx && yst <= destinationy) {
+        if (Solve_Maze(arr, x + 1, y, sol, row, col, destinationx, destinationy, xst, yst))
+          return true
+
+        if (Solve_Maze(arr: Array[Array[Int]], x, y + 1, sol, row, col, destinationx, destinationy, xst, yst))
+          return true
+      }
+
+      if (xst >= destinationx && yst >= destinationy) {
+        if (Solve_Maze(arr: Array[Array[Int]], x - 1, y, sol, row, col, destinationx, destinationy, xst, yst))
+          return true
+
+        if (Solve_Maze(arr: Array[Array[Int]], x, y - 1, sol, row, col, destinationx, destinationy, xst, yst))
+          return true
+      }
+
+      if (xst >= destinationx && yst <= destinationy) {
+        if (Solve_Maze(arr: Array[Array[Int]], x -1, y, sol, row, col, destinationx, destinationy, xst, yst))
+          return true
+
+        if (Solve_Maze(arr: Array[Array[Int]], x, y +1, sol, row, col, destinationx, destinationy, xst, yst))
+          return true
+      }
+
+      if (xst <= destinationx && yst >= destinationy) {
+        if (Solve_Maze(arr: Array[Array[Int]], x, y -1, sol, row, col, destinationx, destinationy, xst, yst))
+          return true
+
+        if (Solve_Maze(arr: Array[Array[Int]], x + 1, y, sol, row, col, destinationx, destinationy, xst, yst))
+          return true
+      }
+
+
+      sol(x)(y) = 0
+      return false
+    }
+
+
+    return false
+  }
+}
+
+
+
+
+
