@@ -1,0 +1,68 @@
+
+
+import org.joda.time.format.DateTimeFormat
+import org.joda.time.LocalTime
+import org.joda.time.LocalDate
+import org.apache.spark._
+import scala.util.matching.Regex
+
+
+object Da{
+  def main(arg: Array[String]): Unit = {
+    var sparkConf = new SparkConf()
+    var sc = new SparkContext(sparkConf)
+    var firstRdd = sc.textFile("file:////home/mehak/flight-delays/flights.csv")
+    var filterRdd = firstRdd.filter(x => !x.contains("YEAR"))
+    var pathrdd = sc.textFile("file:////home/mehak/flight-delays/airline.csv")
+   // var flightData = filterRdd.map(parse)
+
+
+   // var totalDistansce = flightData.map(_.distance).reduce((x, y) => x + y)
+    //var flightCount = flightData.map(_.dep_dely > 0).count().toDouble
+
+    var expression: Regex = "([A-za-z0-9],{2,}[A-za-z0-9])".r
+    var rdd2 = filterRdd.filter(x => (expression.findFirstMatchIn(x) == None))
+    var newrdd = rdd2.map(parse)
+    var totalFlights = newrdd.count()
+    var depdelayflights = newrdd.filter(x => x.ar_delay>0)
+    var delayrdd = newrdd.filter(x => x.dep_dely>0).count().toDouble
+    var percentageoflatedelay = (delayrdd/totalFlights)*100
+    var arrivalflightsdelay = newrdd.filter(x => x.ar_delay>0)
+    var depdelayavg = depdelayflights.map(_.dep_dely).reduce((x,y) =>x+y)/delayrdd
+    var arrdelay = newrdd.filter(x => x.ar_delay > 0).count().toDouble
+    var arrivaldelayavg = arrivalflightsdelay.map(_.ar_delay).reduce((x,y) => x+y)/arrdelay
+    var percentageofarrivaldelay = (arrdelay/totalFlights)*100
+    var pairrdd = newrdd.map(x=> ((x.airline),x))
+    var p = pairrdd.mapValues(x => (x.ar_delay,x.distance,1)).reduceByKey((v1,v2)=> (v1._1+v2._1,v2._1+v2._2,v1._3+v2._3))
+    p.collect().foreach(println)
+    var sampletest = newrdd.map(w => ((w.airline),1)).reduceByKey(_+_)
+    var USData = newrdd.filter(_.airline == "US")
+
+
+  }
+  case class Flight(date: LocalDate, airline: String, flightNumber: String, origin: String,dest: String, dep: LocalTime, dep_dely: Double, arv: LocalTime,ar_delay: Double, airtime: Double, distance: Double) extends Serializable {}
+  def parse(row: String): Flight = {
+    val fields = row.split(",")
+    val datePattern = DateTimeFormat.forPattern("YYYY-mm-dd")
+    val timepattern = DateTimeFormat.forPattern("HHmm")
+    val date: LocalDate = datePattern.parseDateTime(fields(0)+"-"+fields(1)+"-"+fields(2)).toLocalDate()
+    val airline: String = fields(4)
+    val flightNumber: String = fields(5)
+    val origin: String = fields(7)
+    val dest: String = fields(8)
+
+    if (fields(10) == "2400") fields(10) = "0000"
+    val dep: LocalTime = timepattern.parseLocalTime(fields(10))
+
+    val dep_dely: Double = fields(11).toDouble
+
+    if (fields(21) == "2400") fields(21) = "0000"
+    val arv: LocalTime = timepattern.parseLocalTime(fields(21))
+
+    val ar_delay: Double = fields(22).toDouble
+    val airtime: Double = fields(16).toDouble
+    val distance: Double = fields(17).toDouble
+
+    Flight(date, airline, flightNumber, origin, dest, dep, dep_dely, arv, ar_delay, airtime, distance)
+  }
+}
